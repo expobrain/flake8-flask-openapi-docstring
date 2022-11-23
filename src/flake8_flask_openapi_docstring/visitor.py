@@ -2,11 +2,18 @@ import ast
 from typing import List
 
 from apispec.yaml_utils import load_yaml_from_docstring
+from yaml import YAMLError
+
+from flake8_flask_openapi_docstring.types import (
+    InvalidYAMLVisitorResult,
+    MissingOpenAPIFragmentVisitorResult,
+    VisitorResultItem,
+)
 
 
 class FlaskOpenAPIDocStringVisitor(ast.NodeVisitor):
     def __init__(self) -> None:
-        self.results: List[ast.FunctionDef] = []
+        self.results: List[VisitorResultItem] = []
 
     def _is_route_decorator(self, node: ast.expr) -> bool:
         if not isinstance(node, ast.Call):
@@ -36,7 +43,13 @@ class FlaskOpenAPIDocStringVisitor(ast.NodeVisitor):
         )
 
         if has_route_decorators:
-            has_openapi_docstring = self._has_openapi_docstring(node)
+            try:
+                has_openapi_docstring = self._has_openapi_docstring(node)
+            except YAMLError:
+                self.results.append(VisitorResultItem(node=node, result=InvalidYAMLVisitorResult))
+                return
 
             if not has_openapi_docstring:
-                self.results.append(node)
+                self.results.append(
+                    VisitorResultItem(node=node, result=MissingOpenAPIFragmentVisitorResult)
+                )
