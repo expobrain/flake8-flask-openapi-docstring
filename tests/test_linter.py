@@ -17,6 +17,62 @@ IS_PY37 = sys.version_info.major == 3 and sys.version_info.minor == 7
                 """
                 @route("/hello")
                 def hello():
+                    '''
+                    ---
+                    get:
+                        responses:
+                            200:
+                    '''
+                    pass
+                """
+            ),
+            id="Decorated with @route",
+        ),
+        pytest.param(
+            textwrap.dedent(
+                """
+                @app.route("/hello")
+                def hello():
+                    '''
+                    ---
+                    get:
+                        responses:
+                            200:
+                    '''
+                    pass
+                """
+            ),
+            id="Decorated with @<module>.route",
+        ),
+    ],
+)
+def test_linter(code: str) -> None:
+    """
+    GIVEN a function
+        AND the function is decorated with @route
+        AND the function has a docstring with an OpenAPI fragment
+    WHEN the linter is run
+    THEN the linter returns no errors
+    """
+    # GIVEN
+    tree = ast.parse(code)
+    checker = FlaskOpenAPIDocStringLinter(tree)
+
+    # WHEN
+    actual = list(checker.run())
+
+    # THEN
+    assert len(actual) == 0
+
+
+@pytest.mark.parametrize(
+    "code",
+    [
+        pytest.param(
+            textwrap.dedent(
+                """
+                @route("/hello")
+                def hello():
                     pass
                 """
             ),
@@ -64,7 +120,7 @@ IS_PY37 = sys.version_info.major == 3 and sys.version_info.minor == 7
         ),
     ],
 )
-def test_linter_positive(code: str) -> None:
+def test_linter_fails_no_openapi_spec(code: str) -> None:
     """
     GIVEN a function
         AND the function is decorated with @route
@@ -99,40 +155,23 @@ def test_linter_positive(code: str) -> None:
                 def hello():
                     '''
                     ---
-                    get:
-                        responses:
-                            200:
+                    key: "value_with_unclosed_quotes
                     '''
                     pass
                 """
             ),
-            id="Decorated with @route",
-        ),
-        pytest.param(
-            textwrap.dedent(
-                """
-                @app.route("/hello")
-                def hello():
-                    '''
-                    ---
-                    get:
-                        responses:
-                            200:
-                    '''
-                    pass
-                """
-            ),
-            id="Decorated with @<module>.route",
-        ),
+            id="Invalid YAML",
+        )
     ],
 )
-def test_linter_negative(code: str) -> None:
+def test_linter_fails_invalid_yaml(code: str) -> None:
     """
     GIVEN a function
         AND the function is decorated with @route
         AND the function has a docstring with an OpenAPI fragment
+        ANd the docstring includes an invalid YAML
     WHEN the linter is run
-    THEN the linter returns no errors
+    THEN the linter raises an exception
     """
     # GIVEN
     tree = ast.parse(code)
@@ -142,13 +181,10 @@ def test_linter_negative(code: str) -> None:
     actual = list(checker.run())
 
     # THEN
-    assert len(actual) == 0
+    expected = [
+        FlaskOpenAPIDocStringLinter.error(
+            2 if IS_PY37 else 3, 0, "FO101", "Invalid YAML in docstring"
+        )
+    ]
 
-
-# @pytest.mark.parametrize("lineno", range(2))
-# @pytest.mark.parametrize("offset", range(2))
-# @pytest.mark.parametrize("code, message", [["U100", "my message"]])
-# def test_linter_error(lineno: int, offset: int, code: str, message: str) -> None:
-#     actual = FlaskOpenAPIDocStringLinter.error(lineno, offset, code, message)
-
-#     assert actual == (lineno, offset, f"{code} {message}", FlaskOpenAPIDocStringLinter)
+    assert actual == expected

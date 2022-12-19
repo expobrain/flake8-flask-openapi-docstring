@@ -12,4 +12,22 @@ def hello():
     return "Hello World!"
 ```
 
-will raise an error witht his plugin because not only the docstring is missing but also the OpenAPI spec
+will raise an error witht his plugin because not only the docstring is missing but also the OpenAPI spec is missing as well.
+
+However these route:
+
+```python
+@app.route("/hello", methods=["GET"])
+def hello():
+    """
+    Returns a greeting
+
+    ---
+    get:
+        responses:
+            200:
+    """
+    return "Hello World!"
+```
+
+will not raise any error because the docstring is present and the OpenAPI spec is present as well.

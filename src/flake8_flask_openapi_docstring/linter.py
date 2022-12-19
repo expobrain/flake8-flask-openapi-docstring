@@ -6,7 +6,7 @@ from typing import Iterable, Tuple, Type
 from flake8_flask_openapi_docstring.__version__ import __version__
 from flake8_flask_openapi_docstring.visitor import FlaskOpenAPIDocStringVisitor
 
-LintErrorResult = Tuple[int, int, str, Type["FlaskOpenAPIDocStringLinter"]]
+LinterErrorResult = Tuple[int, int, str, Type["FlaskOpenAPIDocStringLinter"]]
 
 
 class FlaskOpenAPIDocStringLinter:
@@ -17,14 +17,17 @@ class FlaskOpenAPIDocStringLinter:
         self.tree = tree
 
     @classmethod
-    def error(cls, lineno: int, offset: int, code: str, message: str) -> LintErrorResult:
+    def error(cls, lineno: int, offset: int, code: str, message: str) -> LinterErrorResult:
         return (lineno, offset, f"{code} {message}", cls)
 
-    def run(self) -> Iterable[LintErrorResult]:
+    def run(self) -> Iterable[LinterErrorResult]:
         visitor = FlaskOpenAPIDocStringVisitor()
         visitor.visit(self.tree)
 
-        for node in visitor.results:
+        for error_item in visitor.results:
             yield self.error(
-                node.lineno, node.col_offset, "FO100", "Missing OpenAPI fragment in docstring"
+                error_item.node.lineno,
+                error_item.node.col_offset,
+                error_item.result.code,
+                error_item.result.message,
             )
