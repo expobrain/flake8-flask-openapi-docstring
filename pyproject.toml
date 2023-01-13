@@ -14,7 +14,7 @@ skip_glob = ".venv"
 
 [tool.poetry]
 name = "flake8-flask-openapi-docstring"
-version = "0.1.1"
+version = "0.1.2"
 description = "A Flake8 plugin to enforce OpenAPI docstrings in Flask routes"
 repository = "https://github.com/expobrain/flake8-flask-openapi-docstring"
 authors = ["Daniele Esposti <daniele.esposti@gmail.com>"]
