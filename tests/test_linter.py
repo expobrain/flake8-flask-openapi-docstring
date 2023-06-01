@@ -1,12 +1,9 @@
 import ast
-import sys
 import textwrap
 
 import pytest
 
 from flake8_flask_openapi_docstring.linter import FlaskOpenAPIDocStringLinter
-
-IS_PY37 = sys.version_info.major == 3 and sys.version_info.minor == 7
 
 
 @pytest.mark.parametrize(
@@ -137,9 +134,7 @@ def test_linter_fails_no_openapi_spec(code: str) -> None:
 
     # THEN
     expected = [
-        FlaskOpenAPIDocStringLinter.error(
-            2 if IS_PY37 else 3, 0, "FO100", "Missing OpenAPI fragment in docstring"
-        )
+        FlaskOpenAPIDocStringLinter.error(3, 0, "FO100", "Missing OpenAPI fragment in docstring")
     ]
 
     assert actual == expected
@@ -181,10 +176,6 @@ def test_linter_fails_invalid_yaml(code: str) -> None:
     actual = list(checker.run())
 
     # THEN
-    expected = [
-        FlaskOpenAPIDocStringLinter.error(
-            2 if IS_PY37 else 3, 0, "FO101", "Invalid YAML in docstring"
-        )
-    ]
+    expected = [FlaskOpenAPIDocStringLinter.error(3, 0, "FO101", "Invalid YAML in docstring")]
 
     assert actual == expected
