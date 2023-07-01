@@ -612,13 +612,13 @@ testing = ["fields", "hunter", "process-tests", "pytest-xdist", "six", "virtuale
 
 [[package]]
 name = "pytest-testmon"
-version = "2.0.6"
+version = "2.0.9"
 description = "selects tests affected by changed files and methods"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "pytest-testmon-2.0.6.tar.gz", hash = "sha256:9c262398515ce05002e4b7cde47b980628bd936aab3931861e81747d910403cc"},
-    {file = "pytest_testmon-2.0.6-py3-none-any.whl", hash = "sha256:8edeb8d0739bbdb9e74023dbedeea726bab2848f1aa67ebfcb761044d8681047"},
+    {file = "pytest-testmon-2.0.9.tar.gz", hash = "sha256:5011e093c5d897a48e4f5769678bf75db57576827bf1112a511315b24a8e4e4d"},
+    {file = "pytest_testmon-2.0.9-py3-none-any.whl", hash = "sha256:8ee537a279cdd02ab999a395010be353e30cd59c167b85f46a901aa50168648f"},
 ]
 
 [package.dependencies]
