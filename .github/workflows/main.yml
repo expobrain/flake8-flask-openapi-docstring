@@ -51,7 +51,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.apispec-version }}-${{ matrix.pyyaml-version }}-${{ hashFiles('**/poetry.lock') }}
       - run: pip install poetry
       - run: poetry install --sync
-      - run: poetry run pip install "apispec~=${{ matrix.apispec-version }}" "pyyaml~=${{ matrix.pyyaml-version }}"
+      - run: poetry run pip install --no-build-isolation "apispec~=${{ matrix.apispec-version }}" "pyyaml~=${{ matrix.pyyaml-version }}"
       - run: poetry run make test
       - run: poetry run make check
 
